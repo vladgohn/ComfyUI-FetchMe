@@ -1,0 +1,23 @@
+[project]
+name = "fetchme-text"
+version = "1.0.0"
+description = "Lightweight ComfyUI text nodes for reusable token dictionaries and prompt filtering."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+authors = [
+  { name = "Vlad Gohn", email = "vladgohn@gmail.com" }
+]
+classifiers = [
+  "Operating System :: OS Independent"
+]
+
+[project.urls]
+Repository = "https://github.com/vladgohn/ComfyUI-FetchMe"
+Documentation = "https://github.com/vladgohn/ComfyUI-FetchMe#readme"
+"Bug Tracker" = "https://github.com/vladgohn/ComfyUI-FetchMe/issues"
+
+[tool.comfy]
+PublisherId = "vladgohn"
+DisplayName = "🍖FetchMe"
+Icon = "https://raw.githubusercontent.com/vladgohn/ComfyUI-FetchMe/main/img/FetchMe_Banner.png"
