@@ -3,10 +3,11 @@ name: Publish to Comfy registry
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
-    paths:
-      - "pyproject.toml"
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
 
 jobs:
   publish-node:
@@ -16,7 +17,15 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
+      - name: Validate registry token
+        shell: bash
+        run: |
+          if [ -z "${{ secrets.REGISTRY_ACCESS_TOKEN }}" ]; then
+            echo "::error title=Missing REGISTRY_ACCESS_TOKEN::Add the Comfy Registry API key in Settings > Secrets and variables > Actions > Repository secrets."
+            exit 1
+          fi
+
       - name: Publish Custom Node
-        uses: Comfy-Org/publish-node-action@main
+        uses: Comfy-Org/publish-node-action@v1
         with:
           personal_access_token: ${{ secrets.REGISTRY_ACCESS_TOKEN }}
