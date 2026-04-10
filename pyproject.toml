@@ -1,5 +1,5 @@
 [project]
-name = "fetchme-text"
+name = "ComfyUI-FetchMe"
 version = "1.0.0"
 description = "Lightweight ComfyUI text nodes for reusable token dictionaries and prompt filtering."
 readme = "README.md"
