@@ -4,6 +4,8 @@ from typing import Dict, Tuple
 
 
 class FetchMeFilter:
+    MAX_CODEX = 10
+
     @classmethod
     def INPUT_TYPES(cls):
         return {
@@ -11,14 +13,8 @@ class FetchMeFilter:
                 "text": ("STRING", {"forceInput": True}),
             },
             "optional": {
-                "codex_1": ("DICT",),
-                "codex_2": ("DICT",),
-                "codex_3": ("DICT",),
-                "codex_4": ("DICT",),
-                "codex_5": ("DICT",),
-                "codex_6": ("DICT",),
-                "codex_7": ("DICT",),
-                "codex_8": ("DICT",),
+                f"codex_{idx}": ("DICT",)
+                for idx in range(1, cls.MAX_CODEX + 1)
             },
         }
 
@@ -43,6 +39,8 @@ class FetchMeFilter:
         codex_6: Dict | None = None,
         codex_7: Dict | None = None,
         codex_8: Dict | None = None,
+        codex_9: Dict | None = None,
+        codex_10: Dict | None = None,
     ) -> Tuple[str]:
         out = "" if text is None else str(text)
 
@@ -55,6 +53,8 @@ class FetchMeFilter:
         self._merge_codex(merged, codex_6)
         self._merge_codex(merged, codex_7)
         self._merge_codex(merged, codex_8)
+        self._merge_codex(merged, codex_9)
+        self._merge_codex(merged, codex_10)
 
         for key, value in merged.items():
             token = str(key)
