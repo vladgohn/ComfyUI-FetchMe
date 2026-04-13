@@ -170,7 +170,26 @@ function installDynamicFilterInputs(node) {
   const suffix = allInputs.slice(lastCodexPos + 1);
   const codexInputs = codexEntries.map((e) => e.input);
 
-  const refresh = () => {
+  const configuredCodexCount = (cfg) => {
+    const inputs = cfg?.inputs;
+    if (!Array.isArray(inputs)) {
+      return null;
+    }
+
+    let highestConfigured = 0;
+    for (const input of inputs) {
+      const idx = codexIndex(input?.name);
+      if (Number.isFinite(idx)) {
+        highestConfigured = Math.max(highestConfigured, idx);
+      }
+    }
+
+    return highestConfigured > 0
+      ? Math.min(codexInputs.length, highestConfigured)
+      : null;
+  };
+
+  const refresh = (cfg) => {
     let lastConnected = 0;
 
     for (let i = 0; i < codexInputs.length; i += 1) {
@@ -179,7 +198,15 @@ function installDynamicFilterInputs(node) {
       }
     }
 
-    const desiredCount = Math.max(1, Math.min(codexInputs.length, lastConnected + 1));
+    const configuredCount = configuredCodexCount(cfg);
+    const desiredCount = Math.max(
+      1,
+      Math.min(
+        codexInputs.length,
+        Math.max(lastConnected + 1, configuredCount ?? 0),
+      ),
+    );
+
     node.inputs = [...prefix, ...codexInputs.slice(0, desiredCount), ...suffix];
     relabelInputs(node, FILTER_INPUT_LABELS);
 
@@ -200,15 +227,17 @@ function installDynamicFilterInputs(node) {
 
   const originalConfigure = node.onConfigure;
   node.onConfigure = function (...args) {
+    // Keep all optional inputs present while ComfyUI restores saved links.
+    node.inputs = [...allInputs];
     const result = typeof originalConfigure === "function"
       ? originalConfigure.apply(this, args)
       : undefined;
-    refresh();
+    refresh(args[0]);
     return result;
   };
 
   node._fetchDynamicCodexInstalled = true;
-  refresh();
+  relabelInputs(node, FILTER_INPUT_LABELS);
 }
 
 app.registerExtension({
