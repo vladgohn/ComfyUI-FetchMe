@@ -4,7 +4,7 @@ from typing import Dict, Tuple
 
 
 class FetchMeFilter:
-    MAX_CODEX = 10
+    MAX_CODEX = 5
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -36,11 +36,6 @@ class FetchMeFilter:
         codex_3: Dict | None = None,
         codex_4: Dict | None = None,
         codex_5: Dict | None = None,
-        codex_6: Dict | None = None,
-        codex_7: Dict | None = None,
-        codex_8: Dict | None = None,
-        codex_9: Dict | None = None,
-        codex_10: Dict | None = None,
     ) -> Tuple[str]:
         out = "" if text is None else str(text)
 
@@ -50,11 +45,6 @@ class FetchMeFilter:
         self._merge_codex(merged, codex_3)
         self._merge_codex(merged, codex_4)
         self._merge_codex(merged, codex_5)
-        self._merge_codex(merged, codex_6)
-        self._merge_codex(merged, codex_7)
-        self._merge_codex(merged, codex_8)
-        self._merge_codex(merged, codex_9)
-        self._merge_codex(merged, codex_10)
 
         for key, value in merged.items():
             token = str(key)

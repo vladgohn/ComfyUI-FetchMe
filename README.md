@@ -15,9 +15,9 @@ FetchMe is a lightweight text utility pack for ComfyUI. It is designed for live 
 The package adds two nodes in the `FetchMe/Text` category:
 
 - `Fetch Codex` creates a `DICT` object from one replacement value and up to 64 keys.
-- `Fetch Filter` merges up to 10 codex dictionaries and replaces matching tokens in the input text.
+- `Fetch Filter` merges up to 5 codex dictionaries and replaces matching tokens in the input text.
 
-Replacements are case-insensitive, so the filter will match the same token in different letter cases. The frontend script also keeps the nodes compact by showing only the inputs that are currently needed.
+Replacements are case-insensitive, so the filter will match the same token in different letter cases.
 
 ## Main workflow
 
@@ -85,7 +85,7 @@ Takes input text and applies replacements from one or more codex dictionaries.
 Inputs:
 
 - `text`: source text.
-- `codex_1` ... `codex_10`: optional codex dictionaries.
+- `codex_1` ... `codex_5`: optional codex dictionaries.
 
 Output:
 
@@ -121,7 +121,7 @@ beautiful photo girl, photography, natural skin texture, studio light
 After the package is published to the ComfyUI Registry, install it from ComfyUI Manager or with:
 
 ```bash
-comfy node install fetchme-text
+comfy node install ComfyUI-FetchMe
 ```
 
 ### Option 2. Manual install

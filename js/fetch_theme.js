@@ -10,11 +10,6 @@ const FILTER_INPUT_LABELS = {
   codex_3: "codex_III",
   codex_4: "codex_IV",
   codex_5: "codex_V",
-  codex_6: "codex_VI",
-  codex_7: "codex_VII",
-  codex_8: "codex_VIII",
-  codex_9: "codex_IX",
-  codex_10: "codex_X",
 };
 
 function applyBrandColor(node) {
@@ -35,17 +30,6 @@ function relabelInputs(node, labels) {
       input.label = label;
     }
   }
-}
-
-function codexIndex(name) {
-  if (typeof name !== "string") {
-    return null;
-  }
-  const match = /^codex_(\d+)$/.exec(name);
-  if (!match) {
-    return null;
-  }
-  return Number(match[1]);
 }
 
 function keyIndex(name) {
@@ -149,97 +133,6 @@ function installDynamicKeyFields(node) {
   refresh();
 }
 
-function installDynamicFilterInputs(node) {
-  if (!Array.isArray(node.inputs) || node.inputs.length === 0 || node._fetchDynamicCodexInstalled) {
-    return;
-  }
-
-  const allInputs = [...node.inputs];
-  const codexEntries = allInputs
-    .map((input, pos) => ({ input, idx: codexIndex(input?.name), pos }))
-    .filter((entry) => Number.isFinite(entry.idx))
-    .sort((a, b) => a.idx - b.idx);
-
-  if (codexEntries.length === 0) {
-    return;
-  }
-
-  const firstCodexPos = Math.min(...codexEntries.map((e) => e.pos));
-  const lastCodexPos = Math.max(...codexEntries.map((e) => e.pos));
-  const prefix = allInputs.slice(0, firstCodexPos);
-  const suffix = allInputs.slice(lastCodexPos + 1);
-  const codexInputs = codexEntries.map((e) => e.input);
-
-  const configuredCodexCount = (cfg) => {
-    const inputs = cfg?.inputs;
-    if (!Array.isArray(inputs)) {
-      return null;
-    }
-
-    let highestConfigured = 0;
-    for (const input of inputs) {
-      const idx = codexIndex(input?.name);
-      if (Number.isFinite(idx)) {
-        highestConfigured = Math.max(highestConfigured, idx);
-      }
-    }
-
-    return highestConfigured > 0
-      ? Math.min(codexInputs.length, highestConfigured)
-      : null;
-  };
-
-  const refresh = (cfg) => {
-    let lastConnected = 0;
-
-    for (let i = 0; i < codexInputs.length; i += 1) {
-      if (codexInputs[i]?.link != null) {
-        lastConnected = i + 1;
-      }
-    }
-
-    const configuredCount = configuredCodexCount(cfg);
-    const desiredCount = Math.max(
-      1,
-      Math.min(
-        codexInputs.length,
-        Math.max(lastConnected + 1, configuredCount ?? 0),
-      ),
-    );
-
-    node.inputs = [...prefix, ...codexInputs.slice(0, desiredCount), ...suffix];
-    relabelInputs(node, FILTER_INPUT_LABELS);
-
-    if (typeof node.computeSize === "function" && typeof node.setSize === "function") {
-      node.setSize(node.computeSize());
-    }
-    node.setDirtyCanvas(true, true);
-  };
-
-  const originalConnectionsChange = node.onConnectionsChange;
-  node.onConnectionsChange = function (...args) {
-    const result = typeof originalConnectionsChange === "function"
-      ? originalConnectionsChange.apply(this, args)
-      : undefined;
-    refresh();
-    return result;
-  };
-
-  const originalConfigure = node.onConfigure;
-  node.onConfigure = function (...args) {
-    // Keep all optional inputs present while ComfyUI restores saved links.
-    node.inputs = [...allInputs];
-    const result = typeof originalConfigure === "function"
-      ? originalConfigure.apply(this, args)
-      : undefined;
-    refresh(args[0]);
-    return result;
-  };
-
-  node._fetchDynamicCodexInstalled = true;
-  relabelInputs(node, FILTER_INPUT_LABELS);
-}
-
 app.registerExtension({
   name: "FetchMe.ThemeAndLabels",
   nodeCreated(node) {
@@ -250,7 +143,7 @@ app.registerExtension({
     applyBrandColor(node);
 
     if (node.comfyClass === "FetchMeFilter") {
-      installDynamicFilterInputs(node);
+      relabelInputs(node, FILTER_INPUT_LABELS);
     }
 
     if (DYNAMIC_KEY_CLASSES.has(node.comfyClass)) {
